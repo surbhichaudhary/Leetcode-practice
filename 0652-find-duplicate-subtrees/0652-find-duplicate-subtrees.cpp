@@ -12,40 +12,35 @@
 class Solution {
 public:
     
-    unordered_map< string, vector<TreeNode*> > mp;
+    unordered_map<string, vector<TreeNode*> > mp;
     
-    string unique( TreeNode* root ){
+    string inorder( TreeNode* root, vector<int>& in ){
         if( !root ){
             return "";
         }
         
-        string curr = to_string(root->val);
-        curr.push_back('_');
-        string la = unique( root->left );
-        curr += la;
-        
-        curr.push_back('_');
-        string ra = unique( root->right );
-        curr += ra;
-        
-        mp[curr].push_back(root);
-        if( mp[curr].size() > 2 ){
-            mp[curr].pop_back();
-        }
-        return curr;
+        string ans = "c1_";
+        ans += inorder( root->left, in );
+        ans += ("r_");
+        ans += (to_string(root->val));
+        ans += ("c2_");
+        ans += inorder( root->right, in );
+      //  cout<<ans<<endl;
+        mp[ans].push_back(root);
+        return ans;
     }
     
     vector<TreeNode*> findDuplicateSubtrees(TreeNode* root) {
-        mp.clear();
-        vector<TreeNode*> ans;
-        string t = unique(root);
+        vector<int> in;
+        vector<TreeNode*> dup;
         
+        mp.clear();
+        string ans = inorder( root, in );
         for( auto i : mp ){
             if( i.second.size() > 1 ){
-                ans.push_back( (i.second)[0] );
+                dup.push_back(i.second[0]);
             }
         }
-        
-        return ans;
+        return dup;
     }
 };
