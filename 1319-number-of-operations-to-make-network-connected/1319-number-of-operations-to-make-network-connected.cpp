@@ -1,60 +1,51 @@
 class Solution {
 public:
     
-    int find( int a, vector<int>& par ){
-        if( par[a] != a ){
-            par[a] = find( par[a], par );
+    int findParent( int v, vector<int>& par ){
+        if( par[v] == v ){
+            return v;
         }
-        return par[a];
-    }
-    
-    void union_set( int a, int b, vector<int>& par, vector<int>& rank )
-    {
-        if( rank[a] > rank[b] ){
-            par[b] = a;
-            rank[a] += rank[b];
-        }
-        else{
-            par[a] = b;
-            rank[b] += rank[a];
-        }
+        return par[v] = findParent( par[v], par );
     }
     
     int makeConnected(int n, vector<vector<int>>& connections) {
-        vector<int> par( n+1 );
-        vector<int> rank( n+1, 1 );
-        
-        for( int i = 0 ; i <= n ; i++ ){
-            par[i] = i;
+        vector<int> par;
+        vector<int> rank(n, 1);
+        for( int i = 0 ; i < n ; i++ ){
+            par.push_back(i);
         }
         
-        int c = 0, cmp = 0;
+        int extra_cab = 0;
         
         for( int i = 0 ; i < connections.size() ; i++ ){
-            int u = connections[i][0], v = connections[i][1];
-            int p1 = find( u, par), p2 = find( v, par );
+            int v1 = connections[i][0], v2 = connections[i][1];
+            int p1 = findParent( v1, par ), p2 = findParent( v2, par );
             
-            if( p1 == p2 ){
-                c++;
+            if( p1 != p2 ){
+                if( rank[p1] < rank[p2] ){
+                    swap(p1, p2 );
+                }
+                
+                par[p2] = p1;
+                rank[p1] += rank[p2];
             }
             else{
-                union_set( p1, p2, par, rank );
+                extra_cab++;
             }
             
         }
         
-        for( int i = 0 ; i < n ; i++ ){
+        int cc = 0;
+        for( int i = 0 ; i< n ; i++ ){
             if( par[i] == i ){
-                cmp++;
+                cc++;
             }
         }
         
-        int ans = cmp - 1;
-        if( c >= ans ){
-            return ans;
+        if( extra_cab < cc-1 ){
+            return (-1);
         }
-        return -1;
         
+        return ( cc-1 );
     }
 };
-
