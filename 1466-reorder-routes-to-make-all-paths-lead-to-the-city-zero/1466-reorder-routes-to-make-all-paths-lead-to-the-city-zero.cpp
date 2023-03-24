@@ -1,41 +1,35 @@
 class Solution {
 public:
-    
     int minReorder(int n, vector<vector<int>>& connections) {
+        unordered_map< int, unordered_set<int> > out;
+        unordered_map< int, unordered_set<int> > in;
+        vector<int> path( n, false );
+        path[0] = true;
         int ans = 0;
-        unordered_map<int, vector<int>> neigh;
-        unordered_map<int, unordered_set<int>> edge;
-        
-        vector<bool> vis(n, false);
-        
-        for( int i = 0 ; i < connections.size() ; i++ ){
-            int a = connections[i][0], b = connections[i][1];
-            
-            neigh[a].push_back(b);
-            neigh[b].push_back(a);
-            
-            edge[a].insert(b);
-        }
-        
         queue<int> q;
         q.push(0);
-        vis[0] = true;
+        
+        for( int i = 0 ; i < connections.size() ; i++ ){
+            out[ connections[i][0] ].insert( connections[i][1] );
+            in[ connections[i][1] ].insert( connections[i][0] );
+        }
         
         while( !q.empty() ){
             int fr = q.front();
             q.pop();
             
-            for( auto i : neigh[fr] ){
-                if( vis[i] ){
-                    continue;
+            for( auto i : in[fr] ){// edge i->fr
+                if( !path[i] ){
+                    path[i] = true;
+                    q.push(i);
                 }
-                if( !edge.count(i) || ( edge[i].find(fr) == edge[i].end()) ){
-                    edge[i].insert(fr);
+            }
+            for( auto i : out[fr] ){ //edge fr->i
+                if( !path[i] ){
                     ans++;
+                    path[i] = true;
+                    q.push(i);
                 }
-                
-                q.push(i);
-                vis[i] = true;
             }
         }
         
