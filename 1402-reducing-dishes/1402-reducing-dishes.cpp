@@ -1,25 +1,31 @@
+typedef long long ll;
+
 class Solution {
 public:
     
-    int solve( int i, int time, vector<int>& satisfaction, vector<vector<int>>& t ){
+    ll solve( int i, int j, vector<int>& satisfaction, vector<vector<ll>>& dp ){
         if( i >= satisfaction.size() ){
             return 0;
         }
-        if( t[i][time] != -1 ){
-            return t[i][time];
+        
+        if( dp[i][j] != LLONG_MAX ){
+            return dp[i][j];
         }
         
-        int ans = ( time*satisfaction[i]) + solve( i+1, time+1, satisfaction, t);
-        ans = max( ans, solve( i+1, time, satisfaction, t ) );
+        ll exc = solve( i+1, j, satisfaction, dp );
+        ll inc = ( j*satisfaction[i] ) + solve( i+1, j+1, satisfaction, dp );
         
-        return t[i][time] = ans;
+        return ( dp[i][j] = max( inc, exc ) );
+        
     }
     
     int maxSatisfaction(vector<int>& satisfaction) {
-        int n = satisfaction.size();
         sort( satisfaction.begin(), satisfaction.end() );
-        vector<vector<int>> t ( n+1, vector<int>( n+1, -1) );
+        int n = satisfaction.size();
+        vector<vector<ll>> dp( n+1, vector<ll>( n+1, LLONG_MAX ) );
         
-        return solve( 0, 1, satisfaction, t );
+        ll ans = max( ll(0), solve( 0, 1, satisfaction, dp ) );
+        
+        return ans;
     }
 };
